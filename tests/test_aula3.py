@@ -40,9 +40,9 @@ def test_exercicio5(braga_faro):
 
     t = SearchTree(braga_faro, 'depth')
 
-    assert t.search(limit=9) == ['Braga', 'Porto', 'Agueda', 'Coimbra', 'Leiria', 'Santarem', 'Lisboa', 'Beja', 'Faro']
-    assert t.terminals == 149
-    assert t.non_terminals == 88
+    assert t.search(limit=9) == ['Braga', 'Porto', 'Agueda', 'Aveiro', 'Coimbra', 'Leiria', 'Santarem', 'Lisboa', 'Beja', 'Faro']
+    assert t.terminals == 11
+    assert t.non_terminals == 59 
 
 def test_exercicio6(braga_faro):
     t = SearchTree(braga_faro, 'depth')
