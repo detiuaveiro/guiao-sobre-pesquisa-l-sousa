@@ -27,4 +27,4 @@ def test_exercicio9(braga_faro):
 
     assert t.search() == ['Braga', 'Guimaraes', 'Porto', 'Aveiro', 'Agueda', 'Coimbra', 'Figueira', 'Leiria', 'Santarem', 'Evora', 'Beja', 'Faro'] 
     assert t.cost == 147
-    assert t.length() == 11 
+    assert t.length == 11 
