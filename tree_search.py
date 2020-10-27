@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 # Module: tree_search
 #
+=======
+
+# Module: tree_search
+# 
+>>>>>>> upstream/master
 # This module provides a set o classes for automated
 # problem solving through tree search:
 #    SearchDomain  - problem domains
@@ -16,8 +22,11 @@ from abc import ABC, abstractmethod
 # Dominios de pesquisa
 # Permitem calcular
 # as accoes possiveis em cada estado, etc
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> upstream/master
 class SearchDomain(ABC):
 
     # construtor
@@ -58,6 +67,7 @@ class SearchProblem:
         self.domain = domain
         self.initial = initial
         self.goal = goal
+<<<<<<< HEAD
 
     def goal_test(self, state):
         return self.domain.satisfies(state, self.goal)
@@ -77,25 +87,51 @@ class SearchNode:
         return str(self)
 
 
+=======
+    def goal_test(self, state):
+        return self.domain.satisfies(state,self.goal)
+
+# Nos de uma arvore de pesquisa
+class SearchNode:
+    def __init__(self,state,parent): 
+        self.state = state
+        self.parent = parent
+    def __str__(self):
+        return "no(" + str(self.state) + "," + str(self.parent) + ")"
+    def __repr__(self):
+        return str(self)
+
+>>>>>>> upstream/master
 # Arvores de pesquisa
 class SearchTree:
 
     # construtor
+<<<<<<< HEAD
     def __init__(self, problem, strategy="breadth"):
+=======
+    def __init__(self,problem, strategy='breadth'): 
+>>>>>>> upstream/master
         self.problem = problem
         root = SearchNode(problem.initial, None)
         self.open_nodes = [root]
         self.strategy = strategy
         self.solution = None
+<<<<<<< HEAD
         self.terminals = 0
         self.non_terminals = 0
 
     # obter o caminho (sequencia de estados) da raiz ate um no
     def get_path(self, node):
+=======
+
+    # obter o caminho (sequencia de estados) da raiz ate um no
+    def get_path(self,node):
+>>>>>>> upstream/master
         if node.parent == None:
             return [node.state]
         path = self.get_path(node.parent)
         path += [node.state]
+<<<<<<< HEAD
         return path
 
     def length(self):
@@ -132,3 +168,31 @@ class SearchTree:
             self.open_nodes[:0] = lnewnodes
         elif self.strategy == "uniform":
             pass
+=======
+        return(path)
+
+    # procurar a solucao
+    def search(self):
+        while self.open_nodes != []:
+            node = self.open_nodes.pop(0)
+            if self.problem.goal_test(node.state):
+                self.solution = node
+                return self.get_path(node)
+            lnewnodes = []
+            for a in self.problem.domain.actions(node.state):
+                newstate = self.problem.domain.result(node.state,a)
+                newnode = SearchNode(newstate,node)
+                lnewnodes.append(newnode)
+            self.add_to_open(lnewnodes)
+        return None
+
+    # juntar novos nos a lista de nos abertos de acordo com a estrategia
+    def add_to_open(self,lnewnodes):
+        if self.strategy == 'breadth':
+            self.open_nodes.extend(lnewnodes)
+        elif self.strategy == 'depth':
+            self.open_nodes[:0] = lnewnodes
+        elif self.strategy == 'uniform':
+            pass
+
+>>>>>>> upstream/master
