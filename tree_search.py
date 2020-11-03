@@ -1,32 +1,24 @@
-<<<<<<< HEAD
-# Module: tree_search
+# Modulo: tree_search
 #
-=======
-
-# Module: tree_search
-# 
->>>>>>> upstream/master
-# This module provides a set o classes for automated
-# problem solving through tree search:
-#    SearchDomain  - problem domains
-#    SearchProblem - concrete problems to be solved
-#    SearchNode    - search tree nodes
-#    SearchTree    - search tree with the necessary methods for searhing
+# Fornece um conjunto de classes para suporte a resolucao de
+# problemas por pesquisa em arvore:
+#    SearchDomain  - dominios de problemas
+#    SearchProblem - problemas concretos a resolver
+#    SearchNode    - nos da arvore de pesquisa
+#    SearchTree    - arvore de pesquisa, com metodos para
+#                    a respectiva construcao
 #
 #  (c) Luis Seabra Lopes
-#  Introducao a Inteligencia Artificial, 2012-2019,
-#  Inteligência Artificial, 2014-2019
+#  Introducao a Inteligencia Artificial, 2012-2018,
+#  Inteligência Artificial, 2014-2018
 
 from abc import ABC, abstractmethod
 
 # Dominios de pesquisa
 # Permitem calcular
 # as accoes possiveis em cada estado, etc
-<<<<<<< HEAD
 
 
-=======
->>>>>>> upstream/master
 class SearchDomain(ABC):
 
     # construtor
@@ -51,148 +43,141 @@ class SearchDomain(ABC):
 
     # custo estimado de chegar de um estado a outro
     @abstractmethod
-    def heuristic(self, state, goal):
+    def heuristic(self, state, goal_state):
         pass
-
-    # test if the given "goal" is satisfied in "state"
-    @abstractmethod
-    def satisfies(self, state, goal):
-        pass
-
 
 # Problemas concretos a resolver
 # dentro de um determinado dominio
+
+
 class SearchProblem:
     def __init__(self, domain, initial, goal):
         self.domain = domain
         self.initial = initial
         self.goal = goal
-<<<<<<< HEAD
 
     def goal_test(self, state):
-        return self.domain.satisfies(state, self.goal)
-
+        return state == self.goal
 
 # Nos de uma arvore de pesquisa
+
+
 class SearchNode:
-    def __init__(self, state, parent, depth=0):
+    def __init__(self, state, parent, depth, cost, heuristic=0):
         self.state = state
         self.parent = parent
-        self.depth = depth
+        self.depth = depth  # Added for Ex 2.
+        self.cost = cost  # Added for Ex 7
+
+        self.heuristic = heuristic  # Added for Ex11/12
+
+    # Added to prevent infinite loop created by visiting parent nodes over and over again (Ex 1.)
+    def in_parent(self, state):
+        if self.parent == None:
+            return False
+        return self.state == state or self.parent.in_parent(state)
 
     def __str__(self):
-        return "no(" + str(self.state) + "," + str(self.parent) + ")"
+        # Changed for Ex 2.
+        return f"no({self.state},{self.depth},{self.cost})"
 
     def __repr__(self):
         return str(self)
 
-
-=======
-    def goal_test(self, state):
-        return self.domain.satisfies(state,self.goal)
-
-# Nos de uma arvore de pesquisa
-class SearchNode:
-    def __init__(self,state,parent): 
-        self.state = state
-        self.parent = parent
-    def __str__(self):
-        return "no(" + str(self.state) + "," + str(self.parent) + ")"
-    def __repr__(self):
-        return str(self)
-
->>>>>>> upstream/master
 # Arvores de pesquisa
+
+
 class SearchTree:
 
     # construtor
-<<<<<<< HEAD
-    def __init__(self, problem, strategy="breadth"):
-=======
-    def __init__(self,problem, strategy='breadth'): 
->>>>>>> upstream/master
+    def __init__(self, problem, strategy='breadth'):
         self.problem = problem
-        root = SearchNode(problem.initial, None)
+        root = SearchNode(problem.initial, None, 0, 0, self.problem.domain.heuristic(
+            self.problem.initial, self.problem.goal))  # Criação do nó raiz
         self.open_nodes = [root]
         self.strategy = strategy
-        self.solution = None
-<<<<<<< HEAD
-        self.terminals = 0
-        self.non_terminals = 0
+
+        self.length = 0  # Added for Ex 3.
+
+        self.terminal = 0  # Added for Ex 5
+        self.non_terminal = 1  # Added for Ex 5
+
+        self.ramification = None  # Added for Ex 6
+
+        self.cost = 0  # Added for Ex8.
+
+        self.max_accumulated_costs = [root]  # Added for Ex15
+
+        self.all_node_depth = []  # Added for Ex16
+        self.avg_node_depth = 0  # Added for Ex16
 
     # obter o caminho (sequencia de estados) da raiz ate um no
     def get_path(self, node):
-=======
-
-    # obter o caminho (sequencia de estados) da raiz ate um no
-    def get_path(self,node):
->>>>>>> upstream/master
         if node.parent == None:
-            return [node.state]
+            return [node]  # Changed for Ex 2.
         path = self.get_path(node.parent)
-        path += [node.state]
-<<<<<<< HEAD
-        return path
-
-    def length(self):
-        return self.solution.depth
+        path += [node]  # Changed for Ex 2. (so it displays the breadth aswell)
+        return(path)
 
     # procurar a solucao
-
-    def search(self, limit=None):
+    def search(self, limit):  # Added limit for Ex 4
         while self.open_nodes != []:
             node = self.open_nodes.pop(0)
             if self.problem.goal_test(node.state):
-                self.solution = node  # define como solution o node que deu bem
+                # -1 pq queremos retirar a raiz. Added for Ex 6
+                self.ramification = (
+                    self.terminal + self.non_terminal - 1)/self.non_terminal
+
+                self.avg_node_depth = sum(
+                    self.all_node_depth)/len(self.all_node_depth)  # Added for Ex 16
+
                 return self.get_path(node)
             lnewnodes = []
             for a in self.problem.domain.actions(node.state):
                 newstate = self.problem.domain.result(node.state, a)
-                # aumenta o depth count
-                newnode = SearchNode(newstate, node, node.depth + 1)
-                # para não repetir estados
-                if newstate not in self.get_path(node) and (limit is None or newnode.depth < limit):
-                    lnewnodes.append(newnode)
+                # Added to prevent infinite loop created by visiting parent nodes over and over again (Ex 1.) ; Added for Ex 4 (and node.depth (...))
+                if not node.in_parent(newstate) and node.depth < limit:
+                    # Added node.depth+1 for Ex 2. ; Added node.cost+(...) for Ex 8.
+                    lnewnodes += [SearchNode(newstate, node, node.depth+1,
+                                             node.cost +
+                                             self.problem.domain.cost(
+                                                 node.state, a),
+                                             self.problem.domain.heuristic(
+                                                 newstate, self.problem.goal)  # Added for Ex 11/12
+                                             )]
+                    self.length += 1  # Added for Ex 3.
+                    # Added for Ex 9.
+                    self.cost += self.problem.domain.cost(node.state, a)
+
+                    # Added for Ex 15
+                    if node.cost > self.max_accumulated_costs[0].cost:
+                        self.max_accumulated_costs = [node]
+                    elif node.cost == self.max_accumulated_costs[0].cost and node not in self.max_accumulated_costs:
+                        self.max_accumulated_costs.append(node)
+
+                    self.all_node_depth.append(node.depth)  # Added for Ex16
 
             self.add_to_open(lnewnodes)
 
-        self.non_terminals = len(lnewnodes)
+            self.non_terminal += len(lnewnodes)  # Added for Ex 5.
+            if lnewnodes == []:  # Added for Ex 5.
+                self.terminal += 1  # Added for Ex 5.
+                self.non_terminal -= 1  # Added for Ex 5.
 
         return None
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia
     def add_to_open(self, lnewnodes):
-        if self.strategy == "breadth":
-            self.open_nodes.extend(lnewnodes)
-        elif self.strategy == "depth":
-            self.open_nodes[:0] = lnewnodes
-        elif self.strategy == "uniform":
-            pass
-=======
-        return(path)
-
-    # procurar a solucao
-    def search(self):
-        while self.open_nodes != []:
-            node = self.open_nodes.pop(0)
-            if self.problem.goal_test(node.state):
-                self.solution = node
-                return self.get_path(node)
-            lnewnodes = []
-            for a in self.problem.domain.actions(node.state):
-                newstate = self.problem.domain.result(node.state,a)
-                newnode = SearchNode(newstate,node)
-                lnewnodes.append(newnode)
-            self.add_to_open(lnewnodes)
-        return None
-
-    # juntar novos nos a lista de nos abertos de acordo com a estrategia
-    def add_to_open(self,lnewnodes):
         if self.strategy == 'breadth':
             self.open_nodes.extend(lnewnodes)
         elif self.strategy == 'depth':
             self.open_nodes[:0] = lnewnodes
-        elif self.strategy == 'uniform':
-            pass
-
->>>>>>> upstream/master
+        elif self.strategy == 'uniform':  # Implemented for Ex 10
+            self.open_nodes.extend(lnewnodes)
+            self.open_nodes.sort(key=lambda node: node.cost)
+        elif self.strategy == 'greedy':  # Implemented for Ex13
+            self.open_nodes.extend(lnewnodes)
+            self.open_nodes.sort(key=lambda node: node.heuristic)
+        elif self.strategy == 'a*':  # Implemented for Ex14
+            self.open_nodes = sorted(
+                self.open_nodes + lnewnodes, key=lambda node: node.cost + node.heuristic)
